@@ -15,7 +15,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class GcmIntentService extends IntentService {
-    public static final int NOTIFICATION_ID = 1;
+    public int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
     String TAG = "HejApp";
@@ -65,6 +65,7 @@ public class GcmIntentService extends IntentService {
     // This is just one simple example of what you might choose to do with
     // a GCM message.
     private void sendNotification(String msg) {
+        NOTIFICATION_ID = msg.hashCode();
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -77,12 +78,12 @@ public class GcmIntentService extends IntentService {
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("Hej")
                         .setTicker("Hej from " + msg + "!")
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText("Hej from " + msg))
+                        //.setStyle(new NotificationCompat.BigTextStyle()
+                          //      .bigText("Hej from " + msg))
                         .setVibrate(notifyVibrate)
                         .setSound(Uri.parse("android.resource://" + getApplicationContext().getPackageName() + "/" + R.raw.hejsound))
                         .setLights(0xFFFF8B00,200,200)
-                        .setContentText(msg);
+                        .setContentText("Hej from " + msg + "!");
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
