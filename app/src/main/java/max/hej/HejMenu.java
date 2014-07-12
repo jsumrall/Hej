@@ -107,6 +107,9 @@ public class HejMenu extends ListActivity
         // Setting this scroll listener is required to ensure that during ListView scrolling,
         // we don't look for swipes.
         listview.setOnScrollListener(touchListener.makeScrollListener());
+
+        AppRater.app_launched(this);
+
     }
     public void onResume(){
         super.onResume();

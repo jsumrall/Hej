@@ -63,7 +63,6 @@ Context context;
             }
         };
         context = getApplicationContext();
-
         if (checkPlayServices()) {
             gcm = GoogleCloudMessaging.getInstance(this);
             regid = getRegistrationId(context);
