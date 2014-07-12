@@ -75,6 +75,14 @@ public class SettingsMenu extends Activity {
         }
     }
 
+    public void inviteFriendsBtnClicked(View view){
+        Intent inviteIntent = new Intent();
+        inviteIntent.setAction(Intent.ACTION_SEND);
+        inviteIntent.putExtra(Intent.EXTRA_TEXT, "Add me on Hej at: " + username + "\n Get Hej at goo.gl/iHJu4r");
+        inviteIntent.setType("text/plain");
+        startActivity(Intent.createChooser(inviteIntent, "Choose how to share Hej"));
+    }
+
 
     public void addFriendBtnClicked(View view){
         //check if friend exists. If yes, add to friends list (shared prefs), otherwise give an invalid username toast
