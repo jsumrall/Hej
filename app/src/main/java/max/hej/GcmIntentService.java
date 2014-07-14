@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -20,8 +21,10 @@ public class GcmIntentService extends IntentService {
     NotificationCompat.Builder builder;
     String TAG = "HejApp";
 
+
     public GcmIntentService() {
         super("GcmIntentService");
+
     }
 
     @Override
@@ -68,9 +71,12 @@ public class GcmIntentService extends IntentService {
         NOTIFICATION_ID = msg.hashCode();
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
-
+        Intent hejIntent = new Intent(this, MyActivity.class);
+        hejIntent.putExtra("sender", msg);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MyActivity.class), 0);
+                hejIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+
         long[] notifyVibrate = {0,200,100,200};
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -78,12 +84,11 @@ public class GcmIntentService extends IntentService {
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("Hej")
                         .setTicker("Hej from " + msg + "!")
-                        //.setStyle(new NotificationCompat.BigTextStyle()
-                          //      .bigText("Hej from " + msg))
                         .setVibrate(notifyVibrate)
                         .setSound(Uri.parse("android.resource://" + getApplicationContext().getPackageName() + "/" + R.raw.hejsound))
                         .setLights(0xFFFF8B00,200,200)
                         .setContentText("Hej from " + msg + "!");
+
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());

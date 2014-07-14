@@ -18,8 +18,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,11 +52,15 @@ Context context;
         SharedPreferences credentials = getSharedPreferences(PREFS_NAME, 0);
         this.username = credentials.getString("username","not set");
         this.password = credentials.getString("password", "not set");//I'm going to hell for this
-        friends = new FriendList(credentials.getString("friends",""), credentials);
+        friends = new FriendList(credentials.getString("friends",username), credentials);
         //System.out.println(username);
         //create two different intents based on creating account or not
         this.createAccountIntent = new Intent(this, CreateAccount.class);
         this.mainMenu = new Intent(this, HejMenu.class);
+        this.mainMenu.putExtras(getIntent().getExtras());
+        //check if started from Hej notification:
+
+
         //setup handler for when username validation completes.
         handler = new Handler(){
             public void handleMessage(Message msg){
@@ -135,11 +138,6 @@ Context context;
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    protected void onresume(){
-        super.onResume();
-        checkPlayServices();
     }
 
     /**
@@ -283,4 +281,5 @@ Context context;
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
         editor.commit();
     }
+
 }

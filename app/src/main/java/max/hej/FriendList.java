@@ -53,5 +53,14 @@ public class FriendList {
             this.credentials.edit().putString("friends", csv).commit();
         }
     }
+    public void addIfNotFriend(String newFriend){
+        if(!friends.contains(newFriend)){
+            System.out.println("new friend: " + newFriend);
+            addFriend(newFriend);
+        }
+    }
+    public boolean isAFriend(String person){
+        return friends.contains(person);
+    }
 
 }

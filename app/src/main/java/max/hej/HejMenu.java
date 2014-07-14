@@ -56,6 +56,7 @@ public class HejMenu extends ListActivity
         credentials = getSharedPreferences(MyActivity.PREFS_NAME, 0);
         username = credentials.getString("username", "not set");
         password = credentials.getString("password", "not set");
+        checkForNewFriendFromNotification();
         FRIEND = MyActivity.friends.asArray();
 
         handler = new Handler(){
@@ -106,6 +107,7 @@ public class HejMenu extends ListActivity
     }
     public void onResume(){
         super.onResume();
+        checkForNewFriendFromNotification();
         FRIEND = MyActivity.friends.asArray();
         listview.setAdapter(new CustomAdapter(getApplicationContext(), FRIEND));
         listview.setOnItemClickListener(this);
@@ -182,6 +184,18 @@ public class HejMenu extends ListActivity
             convertView.setBackgroundColor(colors[random.nextInt(colors.length)]);
             //convertView.setOnTouchListener(this);
             return convertView;
+        }
+    }
+    private void checkForNewFriendFromNotification(){
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            if(extras.containsKey("sender")){
+                String msgFrom = extras.getString("sender");
+                if(!msgFrom.equals("null")) {
+                    MyActivity.friends.addIfNotFriend(msgFrom);//add the person to friends list if they are not a friend.
+                }
+            }
+
         }
     }
 
