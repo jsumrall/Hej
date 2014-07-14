@@ -18,6 +18,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,6 +37,7 @@ public class MyActivity extends Activity {
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
+    protected static FriendList friends;
 Context context;
     String SENDER_ID = "820364492973";
 
@@ -50,6 +53,7 @@ Context context;
         SharedPreferences credentials = getSharedPreferences(PREFS_NAME, 0);
         this.username = credentials.getString("username","not set");
         this.password = credentials.getString("password", "not set");//I'm going to hell for this
+        friends = new FriendList(credentials.getString("friends",""), credentials);
         //System.out.println(username);
         //create two different intents based on creating account or not
         this.createAccountIntent = new Intent(this, CreateAccount.class);

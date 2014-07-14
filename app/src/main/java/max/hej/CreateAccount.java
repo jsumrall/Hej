@@ -46,15 +46,15 @@ public class CreateAccount extends Activity {
     public void accountCreationResults(String string){
         String[] results = string.split(",");
         if(results[0].equals("created")){
-            //System.out.println("Created Successfully");
+            if(results.length > 2) {
+                SharedPreferences credentials = getSharedPreferences(MyActivity.PREFS_NAME, 0);
+                credentials.edit().putString("username", results[1]).commit();
+                credentials.edit().putString("password", results[2]).commit();
 
-            SharedPreferences credentials = getSharedPreferences(MyActivity.PREFS_NAME, 0);
-            credentials.edit().putString("username" , results[1]).commit();
-            credentials.edit().putString("password", results[2]).commit();
-
-            Intent intent = new Intent(this, HejMenu.class);
-            startActivity(intent);
-            finish();
+                Intent intent = new Intent(this, HejMenu.class);
+                startActivity(intent);
+                finish();
+            }
         }
         else if(results[0].equals("unavailable")){
             //System.out.println("Username not available");
@@ -89,9 +89,17 @@ public class CreateAccount extends Activity {
     public void tryToCreateAccount(View view){
         String name = ((EditText)findViewById(R.id.editText2)).getText().toString().toUpperCase();
         String password = ((EditText)findViewById(R.id.editText)).getText().toString();
-        //System.out.println(name + ", " + password);
-        Communicator comm = new Communicator(Communicator.requestType.NEWUSER,name, password, regid, handler);
-        comm.execute();
+        if((name.length() > 1) &&(password.length() > 2)) {
+            Communicator comm = new Communicator(Communicator.requestType.NEWUSER, name, password, regid, handler);
+            comm.execute();
+        }
+        else{
+            Context context = getApplicationContext();
+            CharSequence text = "Name must be at least 2 character, and password must be at least 3 characters.";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
     }
 
     @Override

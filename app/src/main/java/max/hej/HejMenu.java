@@ -56,15 +56,9 @@ public class HejMenu extends ListActivity
         credentials = getSharedPreferences(MyActivity.PREFS_NAME, 0);
         username = credentials.getString("username", "not set");
         password = credentials.getString("password", "not set");
-        FRIEND = credentials.getString("friends",username).split(",");
-                handler = new Handler(){
-            public void handleMessage(Message msg){
-                Bundle bundle = msg.getData();
-                String string = bundle.getString("0");
-                checkForHejsResults(string);
-            }
-        };
-        handler2 = new Handler(){
+        FRIEND = MyActivity.friends.asArray();
+
+        handler = new Handler(){
             public void handleMessage(Message msg){
                 Bundle bundle = msg.getData();
                 String string = bundle.getString("0");
@@ -80,7 +74,6 @@ public class HejMenu extends ListActivity
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //removeFriend(position);
                 return true;
             }
         });
@@ -98,9 +91,9 @@ public class HejMenu extends ListActivity
                             public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
                                     //System.out.println("Remove " + position);
-                                    removeFriend(position);
+                                    MyActivity.friends.removeFriend(position);
+                                    refreshFriendList();
                                 }
-                                //mAdapter.notifyDataSetChanged();
                             }
                         });
         listview.setOnTouchListener(touchListener);
@@ -113,14 +106,9 @@ public class HejMenu extends ListActivity
     }
     public void onResume(){
         super.onResume();
-        FRIEND = credentials.getString("friends",username).split(",");
+        FRIEND = MyActivity.friends.asArray();
         listview.setAdapter(new CustomAdapter(getApplicationContext(), FRIEND));
         listview.setOnItemClickListener(this);
-
-    }
-
-    public void onItemLongClick(AdapterView<?> parent, View view, int position, long id){
-
 
     }
 
@@ -128,32 +116,11 @@ public class HejMenu extends ListActivity
         //TextView tv = (TextView)view.findViewById(R.id.text1);
         //Toast.makeText(getApplicationContext(),"Position is: "+position,Toast.LENGTH_SHORT).show();
         //Toast.makeText(getApplicationContext(),"Text is: "+tv.getText().toString(),Toast.LENGTH_SHORT).show();
-        Communicator comm = new Communicator(Communicator.requestType.SEND,username,password,FRIEND[position],handler2);
+        Communicator comm = new Communicator(Communicator.requestType.SEND,username,password,FRIEND[position],handler);
         comm.execute();
         Toast.makeText(getApplicationContext(),"Sent Hej to: "+FRIEND[position],Toast.LENGTH_SHORT).show();
     }
 
-    public void checkForHejsResults(String string){
-        String[] result = string.split(",");
-        Context context = getApplicationContext();
-        CharSequence text = result[0].equals("") ? "No Hej 4 u" : "Hej from " + result[0] + "!!" ;
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-
-
-    }
-    public void checkForHejs(View view){
-        Communicator comm = new Communicator(Communicator.requestType.CHECKFORHEJS,username,password,"", handler);
-        comm.execute();
-        }
-
-
-
-    public void sendHej(View view){
-        Communicator comm = new Communicator(Communicator.requestType.SEND,username,password,"bob",handler2);
-        comm.execute();
-    }
 
     public void onSettingBtnClick(View view){
         startActivity(settings);
@@ -161,25 +128,12 @@ public class HejMenu extends ListActivity
 
     }
 
-    private void removeFriend(int position){
-        ArrayList<String> arr = new ArrayList<String>(Arrays.asList(FRIEND));
-        arr.remove(FRIEND[position]);
-        FRIEND = arr.toArray(new String[arr.size()]);
-        saveFriendsToPreferences();
+    private void refreshFriendList(){
+        FRIEND = MyActivity.friends.asArray();
         listview.setAdapter(new CustomAdapter(getApplicationContext(), FRIEND));
     }
 
-    private void saveFriendsToPreferences() {
-        String csvFriends = "";
-        for (int i = 0; i < FRIEND.length; i++) {
-            csvFriends += FRIEND[i];
-            if (i < FRIEND.length) {
-                csvFriends += ",";
-            }
-        }
-        if(csvFriends.equals("")){csvFriends += username;}
-        credentials.edit().putString("friends",csvFriends).commit();
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -229,8 +183,27 @@ public class HejMenu extends ListActivity
             //convertView.setOnTouchListener(this);
             return convertView;
         }
-
-
-
     }
+
+    /*public void checkForHejsResults(String string){
+        String[] result = string.split(",");
+        Context context = getApplicationContext();
+        CharSequence text = result[0].equals("") ? "No Hej 4 u" : "Hej from " + result[0] + "!!" ;
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
+
+    public void checkForHejs(View view){
+        Communicator comm = new Communicator(Communicator.requestType.CHECKFORHEJS,username,password,"", handler);
+        comm.execute();
+        }
+
+
+
+    public void sendHej(View view){
+        Communicator comm = new Communicator(Communicator.requestType.SEND,username,password,"bob",handler2);
+        comm.execute();
+    }
+*/
 }

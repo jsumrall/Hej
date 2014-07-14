@@ -15,6 +15,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.gson.Gson;
 
 //import max.hej.HejMenu.java.R;
 
@@ -58,14 +59,6 @@ public class SettingsMenu extends Activity {
 
     }
 
-    public void logoutBtnClicked(View view){
-        //delete shareprefs, return to first activity
-        credentials.edit().putString("username", "not set").commit();
-        credentials.edit().putString("password", "not set").commit();
-        Intent intent = new Intent(this, CreateAccount.class);
-        startActivity(intent);
-    }
-
     public void tryAddFriend(){
         //check if friend exists. If yes, add to friends list (shared prefs), otherwise give an invalid username toast
         this.friendsName = ((EditText)findViewById(R.id.editText)).getText().toString().toUpperCase();
@@ -83,25 +76,10 @@ public class SettingsMenu extends Activity {
         startActivity(Intent.createChooser(inviteIntent, "Choose how to share Hej"));
     }
 
-
-    public void addFriendBtnClicked(View view){
-        //check if friend exists. If yes, add to friends list (shared prefs), otherwise give an invalid username toast
-        this.friendsName = ((EditText)findViewById(R.id.editText)).getText().toString().toUpperCase();
-        if (!this.friendsName.equals("")) {
-            Communicator comm = new Communicator(Communicator.requestType.FINDUSERNAME, username, password, friendsName, handler);
-            comm.execute();
-        }
-    }
     public void findFriendResults(String string){
         String[] result = string.split(",");
         if(result[0].equals("valid")){
-            String currString = credentials.getString("friends","");
-            if(currString.equals("")) {
-                credentials.edit().putString("friends", this.friendsName).commit();
-            }
-            else{
-                credentials.edit().putString("friends",currString + "," + this.friendsName).commit();
-            }
+            MyActivity.friends.addFriend(this.friendsName);
             Context context = getApplicationContext();
             CharSequence text = "Added: " + this.friendsName ;
             int duration = Toast.LENGTH_SHORT;
@@ -138,4 +116,13 @@ public class SettingsMenu extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+      /*public void logoutBtnClicked(View view){
+        //delete shareprefs, return to first activity
+        credentials.edit().putString("username", "not set").commit();
+        credentials.edit().putString("password", "not set").commit();
+        Intent intent = new Intent(this, CreateAccount.class);
+        startActivity(intent);
+    }
+*/
 }
