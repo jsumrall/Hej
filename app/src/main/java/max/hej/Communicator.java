@@ -22,49 +22,42 @@ import javax.net.ssl.SSLSocketFactory;
 
 public class Communicator extends AsyncTask<Void, Void, String> {
     protected String URL = "cheapdrink.nl";
-    protected int port = 9000;
+    protected int port = 8000;
 
     protected SSLSocketFactory socketFactory;
     protected SSLSocket socket;
     protected InputStream IN;
     protected BufferedReader BR;
     protected OutputStream OUT;
-    public enum requestType {NEWUSER, CHECKFORHEJS, SEND, VALIDATE, FINDUSERNAME,UPDATEGCMID}
-    public requestType request;
-    protected String username;
-    protected String password;
-    protected String target;
     protected Handler handler;
     protected PrintWriter PW;
+    private max.hej.Message message;
+    public static final String SUCCESS = "SUCCESS";
+    public static final String FAIL = "FAIL";
 
-    public Communicator(requestType request, String username, String password, String target, Handler handler){
-        this.request = request;
-        this.username = username;
-        this.password = password;
-        this.target = target;
+    public Communicator(max.hej.Message msg, Handler handler){
+        this.message = msg;
         this.handler = handler;
-        this.socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-
+        socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
     }
 
     public String doInBackground(Void...params){
-        switch (this.request) {
-            case NEWUSER:
-                return createAccount(this.username, this.password, this.target);
-            case CHECKFORHEJS:
-                return checkForHejs(this.username, this.password);
-            case VALIDATE:
-                return validateUsername(this.username, this.password, this.target);
-            case FINDUSERNAME:
-                return checkForUsername(this.target);
-            case SEND:
-                sendHej(this.username, this.password, this.target);
-                break;
-            case UPDATEGCMID:
-                updateGCMID(this.username, this.password, this.target);
-                break;
-
+        if(message.getIntent().equals(max.hej.Message.NEW_ACCOUNT)) {
+            return createAccount();
         }
+        else if(message.getIntent().equals(max.hej.Message.VALIDATE_USER_NAME)) {
+            return validateUsername();
+        }
+        else if (message.getIntent().equals(max.hej.Message.CHECK_FOR_USERNAME)) {
+            return checkForUsername();
+        }
+        else if(message.getIntent().equals(max.hej.Message.SEND_HEJ)) {
+            sendHej();
+        }
+        else if(message.getIntent().equals(max.hej.Message.UPDATE_REGID)) {
+            updateGCMID();
+        }
+
         try {
             this.socket.close();
         }
@@ -78,7 +71,7 @@ public class Communicator extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String results) {
                 Message msg = this.handler.obtainMessage();
                 Bundle bundle = new Bundle();
-                results += "," + this.username + "," + this.password;
+                results += "," + message.getUsername() + "," + message.getPassword();
                 bundle.putString("0",results);
                 msg.setData(bundle);
                 handler.sendMessage(msg);
@@ -87,10 +80,10 @@ public class Communicator extends AsyncTask<Void, Void, String> {
 
     private void connectToServer(){
         try{
-            //System.out.println("Trying to connect to Hej server");
+            System.out.println("Trying to connect to Hej server");
             InetAddress serverAddr = InetAddress.getByName(URL);
             this.socket = (SSLSocket) socketFactory.createSocket(serverAddr.getHostAddress(),port);
-            final String[] enabledCipherSuites = this.socket.getSupportedCipherSuites();// { "SSL_DH_anon_WITH_RC4_128_MD5" };
+            final String[] enabledCipherSuites = this.socket.getSupportedCipherSuites();
             this.socket.setEnabledCipherSuites(enabledCipherSuites);
 
             //this.socket = new Socket(serverAddr,port);
@@ -102,29 +95,23 @@ public class Communicator extends AsyncTask<Void, Void, String> {
         catch(Exception e){e.printStackTrace();}
     }
 
-    public String createAccount(String username, String password, String regid){
-        if(this.validateUsername(username,password,regid).equals("valid")){
+    public String createAccount(){
+        if(this.validateUsername().equals(SUCCESS)){
             return "created";
         }
         this.connectToServer();
         try {
-            //System.out.println(regid);
-            //System.out.println("Sending Write");
-            PW.write("addNewUser," + username + "," + password + "," + regid + "\n");
+
+            PW.write(message.asJSONString() + "\n");
             PW.flush();
             //System.out.println("Waiting for response");
             String response = BR.readLine();
-            if(response.equals("New User added: " + username.toUpperCase())){
+            if(response.equals(SUCCESS)){
                 //success
                 return "created";
             }
-            else if(response.equals("Username not available: " + username.toUpperCase())){
-                return "unavailable";
-
-            }
             else{
-                System.out.println("Received Unknown message " + response);
-                return "network error";
+                return "unavailable";
             }
 
         }
@@ -133,57 +120,41 @@ public class Communicator extends AsyncTask<Void, Void, String> {
     }
 
 
-    public void updateGCMID(String username, String password, String regid){
+    public void updateGCMID(){
         connectToServer();
         try{
-            PW.write("updateregid," + username + "," + password + "," + regid + "\n");
+            PW.write(message.asJSONString() + "\n");
             PW.flush();
         }
         catch(Exception e){e.printStackTrace();}
     }
-    public String validateUsername(String username, String password, String target){
+    public String validateUsername(){
         connectToServer();
 
         try{
-            PW.write("validateUsername," + username + "," + password + "," + target + "\n");
+            PW.write(message.asJSONString() + "\n");
             PW.flush();
-            String response = BR.readLine();
-            return response; //expecting string "valid" or "invalid"
-        }
-        catch(Exception e){e.printStackTrace();}
-        return "";//nothing or a problem with connection.
-    }
-
-    public String checkForUsername(String target){
-        connectToServer();
-        try{
-            PW.write("checkForUsername," + username + "," + password + "," + target + "\n");
-            PW.flush();
-            String response = BR.readLine();
-            return response; //expecting string "valid" or "invalid"
+            return BR.readLine(); //expecting string "valid" or "invalid"
         }
         catch(Exception e){e.printStackTrace();}
         return "";//nothing or a problem with connection.
     }
 
-
-    public String checkForHejs(String username, String password){
+    public String checkForUsername(){
         connectToServer();
-
         try{
-            PW.write("checkForHejs," + username + "," + password + "\n");
+            PW.write(message.asJSONString() + "\n");
             PW.flush();
-            String response = BR.readLine();
-            return response;
+            return BR.readLine(); //expecting string "valid" or "invalid"
         }
         catch(Exception e){e.printStackTrace();}
         return "";//nothing or a problem with connection.
     }
 
-    public void sendHej(String username, String password, String target){
+    public void sendHej(){
         connectToServer();
         try{
-            PW.write("sendHej," + username + "," + password + "," + target + "\n");
+            PW.write(message.asJSONString() + "\n");
             PW.flush();
         }
         catch(Exception e){e.printStackTrace();}

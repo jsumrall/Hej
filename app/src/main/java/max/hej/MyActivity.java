@@ -37,7 +37,9 @@ public class MyActivity extends Activity {
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     protected static FriendList friends;
-Context context;
+    private max.hej.Message message;
+
+    Context context;
     String SENDER_ID = "820364492973";
 
     GoogleCloudMessaging gcm;
@@ -92,18 +94,24 @@ Context context;
             startActivity(createAccountIntent);
         } else {
             //validate username/password
-            Communicator comm = new Communicator(Communicator.requestType.VALIDATE, this.username, this.password, this.regid, handler);
+            message = new max.hej.Message.Builder()
+                    .username(username)
+                    .password(password)
+                    .regid(regid)
+                    .intent(max.hej.Message.VALIDATE_USER_NAME)
+                    .build();
+            Communicator comm = new Communicator(message, handler);
             comm.execute();
         }
     }
     public void validateUsernameResult(String string){
         String[] result = string.split(",");
-        if(result[0].equals("valid")){
+        if(result[0].equals(Communicator.SUCCESS)){
             //System.out.println("Logged in");
             //go to main menu
             startActivity(this.mainMenu);
         }
-        else if(result[0].equals("invalid")){
+        else if(result[0].equals(Communicator.FAIL)){
             //System.out.println("invalid credentials");
             //go to login screen
             startActivity(this.createAccountIntent);

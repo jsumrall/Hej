@@ -24,6 +24,7 @@ public class SettingsMenu extends Activity {
     String username;
     String password;
     String friendsName = "";
+    private max.hej.Message message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,13 @@ public class SettingsMenu extends Activity {
         //check if friend exists. If yes, add to friends list (shared prefs), otherwise give an invalid username toast
         this.friendsName = ((EditText)findViewById(R.id.editText)).getText().toString().toUpperCase();
         if (!this.friendsName.equals("")) {
-            Communicator comm = new Communicator(Communicator.requestType.FINDUSERNAME, username, password, friendsName, handler);
+            message = new max.hej.Message.Builder()
+                    .username(username)
+                    .password(password)
+                    .target(friendsName)
+                    .intent(max.hej.Message.CHECK_FOR_USERNAME)
+                    .build();
+            Communicator comm = new Communicator(message, handler);
             comm.execute();
         }
     }
@@ -77,7 +84,7 @@ public class SettingsMenu extends Activity {
 
     public void findFriendResults(String string){
         String[] result = string.split(",");
-        if(result[0].equals("valid")){
+        if(result[0].equals(Communicator.SUCCESS)){
             MyActivity.friends.addFriend(this.friendsName);
             Context context = getApplicationContext();
             CharSequence text = "Added: " + this.friendsName ;
@@ -85,7 +92,7 @@ public class SettingsMenu extends Activity {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
-        else if (result[0].equals("invalid")){
+        else if (result[0].equals(Communicator.FAIL)){
             Context context = getApplicationContext();
             CharSequence text = "Friend not found" ;
             int duration = Toast.LENGTH_SHORT;

@@ -46,6 +46,8 @@ public class HejMenu extends ListActivity
     Cursor mCursor;
     ListView listview;
     String[] FRIEND;
+    private max.hej.Message message;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,10 +117,13 @@ public class HejMenu extends ListActivity
     }
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-        //TextView tv = (TextView)view.findViewById(R.id.text1);
-        //Toast.makeText(getApplicationContext(),"Position is: "+position,Toast.LENGTH_SHORT).show();
-        //Toast.makeText(getApplicationContext(),"Text is: "+tv.getText().toString(),Toast.LENGTH_SHORT).show();
-        Communicator comm = new Communicator(Communicator.requestType.SEND,username,password,FRIEND[position],handler);
+        message = new max.hej.Message.Builder()
+                .username(username)
+                .password(password)
+                .intent(max.hej.Message.SEND_HEJ)
+                .target(FRIEND[position])
+                .build();
+        Communicator comm = new Communicator(message,handler);
         comm.execute();
         Toast.makeText(getApplicationContext(),"Sent Hej to: "+FRIEND[position],Toast.LENGTH_SHORT).show();
     }

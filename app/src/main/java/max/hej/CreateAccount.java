@@ -24,6 +24,7 @@ public class CreateAccount extends Activity {
     Context context;
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private static final String TAG = "HejApp";
+    private max.hej.Message message;
 
 
     @Override
@@ -65,15 +66,6 @@ public class CreateAccount extends Activity {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
-        else if(results[0].equals("network error")){
-            //System.out.println("Network Error");
-            Context context = getApplicationContext();
-            CharSequence text = "Network Error";
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
         else{
             System.out.println("Something went wrong");
             Context context = getApplicationContext();
@@ -90,7 +82,12 @@ public class CreateAccount extends Activity {
         String name = ((EditText)findViewById(R.id.editText2)).getText().toString().toUpperCase();
         String password = ((EditText)findViewById(R.id.editText)).getText().toString();
         if((name.length() > 1) &&(password.length() > 2)) {
-            Communicator comm = new Communicator(Communicator.requestType.NEWUSER, name, password, regid, handler);
+            message = new max.hej.Message.Builder()
+                    .username(name)
+                    .password(password)
+                    .intent(max.hej.Message.NEW_ACCOUNT)
+                    .build();
+            Communicator comm = new Communicator(message, handler);
             comm.execute();
         }
         else{
