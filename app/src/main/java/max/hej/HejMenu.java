@@ -97,7 +97,14 @@ public class HejMenu extends ListActivity
             listview.setOnScrollListener(touchListener.makeScrollListener());
         }
         else{ //Sander edition
-
+            listview.setOnItemLongClickListener( new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    MyActivity.friends.removeFriend(position);
+                    refreshFriendList();
+                    return true;
+                }
+            });
         }
         AppRater.app_launched(this);
 
