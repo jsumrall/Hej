@@ -2,8 +2,6 @@ package max.hej;
 
 import android.content.SharedPreferences;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 /**

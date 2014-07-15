@@ -15,18 +15,18 @@ package max.hej;
  * limitations under the License.
  */
 
-        import android.animation.Animator;
-        import android.animation.AnimatorListenerAdapter;
-        import android.animation.ValueAnimator;
-        import android.app.ListActivity;
-        import android.app.ListFragment;
-        import android.view.MotionEvent;
-        import android.view.VelocityTracker;
-        import android.view.View;
-        import android.view.ViewConfiguration;
-        import android.view.ViewGroup;
-        import android.widget.AdapterView;
-        import android.widget.ListView;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.app.ListActivity;
+import android.app.ListFragment;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 /**
  * A {@link View.OnTouchListener} that makes any {@link View} dismissable when the

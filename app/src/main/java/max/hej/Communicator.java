@@ -11,10 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.Socket;
-import java.security.KeyStore;
-import java.util.Properties;
-import java.util.concurrent.Callable;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;

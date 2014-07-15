@@ -53,7 +53,7 @@ public class SettingsMenu extends Activity {
                     tryAddFriend();
                     handled = true;
                 }
-                return false;
+                return handled;
             }
         });
 
@@ -92,16 +92,14 @@ public class SettingsMenu extends Activity {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
-        else if (result[0].equals(Communicator.FAIL)){
+        else {
             Context context = getApplicationContext();
             CharSequence text = "Friend not found" ;
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
-        else{
 
-        }
     }
 
     @Override
@@ -117,10 +115,7 @@ public class SettingsMenu extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 
       /*public void logoutBtnClicked(View view){

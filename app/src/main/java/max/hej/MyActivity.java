@@ -19,9 +19,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MyActivity extends Activity {
@@ -43,7 +41,6 @@ public class MyActivity extends Activity {
     String SENDER_ID = "820364492973";
 
     GoogleCloudMessaging gcm;
-    AtomicInteger msgId = new AtomicInteger();
 
     String regid;
 
@@ -59,7 +56,9 @@ public class MyActivity extends Activity {
         //create two different intents based on creating account or not
         this.createAccountIntent = new Intent(this, CreateAccount.class);
         this.mainMenu = new Intent(this, HejMenu.class);
-        this.mainMenu.putExtras(getIntent().getExtras());
+        if(getIntent().getExtras() != null) {
+            this.mainMenu.putExtras(getIntent().getExtras());
+        }
         //check if started from Hej notification:
 
 
@@ -230,7 +229,7 @@ public class MyActivity extends Activity {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
-                String msg = "";
+                String msg;
                 try {
                     if (gcm == null) {
                         gcm = GoogleCloudMessaging.getInstance(context);

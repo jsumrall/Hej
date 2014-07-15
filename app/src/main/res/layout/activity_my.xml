@@ -15,7 +15,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/hejtext"
-        android:capitalize="none"
         android:textSize="40dp"
         android:textIsSelectable="false"
         android:textColor="#ffffefff"
