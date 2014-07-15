@@ -160,10 +160,10 @@ public class HejMenu extends ListActivity
 
     private class CustomAdapter extends ArrayAdapter<String> {
         private int[] colors = {/*Color.rgb(255,153,0), Color.rgb(253,94,83), Color.rgb(196,98,16),*/
-                Color.rgb(255, 153, 102), Color.rgb(255, 90, 54), Color.rgb(192, 54, 44),
-                Color.rgb(245, 128, 37), Color.rgb(159, 0, 255), Color.rgb(83, 104, 149),
-                Color.rgb(0, 0, 156), Color.rgb(255, 193, 204), Color.rgb(176, 224, 230),
-                Color.rgb(0, 255, 255), Color.rgb(129, 20, 83), Color.rgb(65, 125, 193)};
+                Color.rgb(41, 103, 105), Color.rgb(149, 90, 54), Color.rgb(192, 54, 44),
+                Color.rgb(191, 114, 154), Color.rgb(150, 191, 114), Color.rgb(145, 114, 191),
+                Color.rgb(191, 126, 114), Color.rgb(127, 114, 191), Color.rgb(114, 175, 191),
+                Color.rgb(140, 191, 114), Color.rgb(114, 185, 191), Color.rgb(114, 191, 143)};
         private Random random = new Random();
         String TAG = "HejApp";
 
