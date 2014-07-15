@@ -26,7 +26,7 @@
         android:id="@+id/textView13"
         android:textColor="#ffffffff"
         android:textSize="45dp"
-        android:onClick="tryToCreateAccount"
+        android:onClick="createAccountBtnClicked"
         android:clickable="true"
         android:layout_below="@+id/editText"
         android:layout_centerHorizontal="true"

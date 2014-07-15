@@ -71,7 +71,6 @@ public class Communicator extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String results) {
                 Message msg = this.handler.obtainMessage();
                 Bundle bundle = new Bundle();
-                results += "," + message.getUsername() + "," + message.getPassword();
                 bundle.putString("0",results);
                 msg.setData(bundle);
                 handler.sendMessage(msg);
@@ -96,27 +95,23 @@ public class Communicator extends AsyncTask<Void, Void, String> {
     }
 
     public String createAccount(){
-        if(this.validateUsername().equals(SUCCESS)){
-            return "created";
-        }
         this.connectToServer();
         try {
-
             PW.write(message.asJSONString() + "\n");
             PW.flush();
             //System.out.println("Waiting for response");
             String response = BR.readLine();
             if(response.equals(SUCCESS)){
                 //success
-                return "created";
+                return SUCCESS;
             }
             else{
-                return "unavailable";
+                return FAIL;
             }
 
         }
         catch(Exception e){e.printStackTrace();}
-        return "error";
+        return FAIL;
     }
 
 
@@ -134,10 +129,17 @@ public class Communicator extends AsyncTask<Void, Void, String> {
         try{
             PW.write(message.asJSONString() + "\n");
             PW.flush();
-            return BR.readLine(); //expecting string "valid" or "invalid"
+            String response =  BR.readLine(); //expecting string "valid" or "invalid"
+            if(response.equals(SUCCESS)){
+                //success
+                return SUCCESS;
+            }
+            else{
+                return FAIL;
+            }
         }
         catch(Exception e){e.printStackTrace();}
-        return "";//nothing or a problem with connection.
+        return FAIL;//nothing or a problem with connection.
     }
 
     public String checkForUsername(){
@@ -148,7 +150,7 @@ public class Communicator extends AsyncTask<Void, Void, String> {
             return BR.readLine(); //expecting string "valid" or "invalid"
         }
         catch(Exception e){e.printStackTrace();}
-        return "";//nothing or a problem with connection.
+        return FAIL;//nothing or a problem with connection.
     }
 
     public void sendHej(){

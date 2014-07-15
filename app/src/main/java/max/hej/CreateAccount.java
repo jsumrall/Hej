@@ -19,9 +19,12 @@ import android.widget.Toast;
 
 public class CreateAccount extends Activity {
     Handler handler;
+    Handler handler2;
     public static final String PROPERTY_REG_ID = "registration_id";
     String regid;
     Context context;
+    String username;
+    String password;
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private static final String TAG = "HejApp";
     private max.hej.Message message;
@@ -35,6 +38,13 @@ public class CreateAccount extends Activity {
             public void handleMessage(Message msg){
                 Bundle bundle = msg.getData();
                 String string = bundle.getString("0");
+                accountValidationResults(string);
+            }
+        };
+        handler2 = new Handler(){
+            public void handleMessage(Message msg){
+                Bundle bundle = msg.getData();
+                String string = bundle.getString("0");
                 accountCreationResults(string);
             }
         };
@@ -43,60 +53,67 @@ public class CreateAccount extends Activity {
 
     }
 
-
-    public void accountCreationResults(String string){
-        String[] results = string.split(",");
-        if(results[0].equals("created")){
-            if(results.length > 2) {
-                SharedPreferences credentials = getSharedPreferences(MyActivity.PREFS_NAME, 0);
-                credentials.edit().putString("username", results[1]).commit();
-                credentials.edit().putString("password", results[2]).commit();
-
-                Intent intent = new Intent(this, HejMenu.class);
-                startActivity(intent);
-                finish();
+    public void accountValidationResults(String result) {
+        System.out.println(result);
+            if (result.equals(Communicator.SUCCESS)) {
+                    SharedPreferences credentials = getSharedPreferences(MyActivity.PREFS_NAME, 0);
+                    credentials.edit().putString("username", username).commit();
+                    credentials.edit().putString("password", password).commit();
+                    showToast("Account Recovered");
+                    Intent intent = new Intent(this, MyActivity.class);
+                    startActivity(intent);
+                    finish();
+            } else{
+                tryToCreateAccount();
             }
         }
-        else if(results[0].equals("unavailable")){
-            //System.out.println("Username not available");
-            Context context = getApplicationContext();
-            CharSequence text = "Username is Taken";
-            int duration = Toast.LENGTH_SHORT;
 
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+
+    public void accountCreationResults(String result){
+        if(result.equals(Communicator.SUCCESS)){
+                SharedPreferences credentials = getSharedPreferences(MyActivity.PREFS_NAME, 0);
+                credentials.edit().putString("username", username).commit();
+                credentials.edit().putString("password", password).commit();
+                showToast("Account Created");
+                Intent intent = new Intent(this, MyActivity.class);
+                startActivity(intent);
+                finish();
+
         }
-        else{
-            System.out.println("Something went wrong");
-            Context context = getApplicationContext();
-            CharSequence text = "Network Error" + results[0];
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+        else if(result.equals(Communicator.FAIL)){
+            showToast("Username is Taken");
         }
     }
 
-
-    public void tryToCreateAccount(View view){
-        String name = ((EditText)findViewById(R.id.editText2)).getText().toString().toUpperCase();
-        String password = ((EditText)findViewById(R.id.editText)).getText().toString();
-        if((name.length() > 1) &&(password.length() > 2)) {
+    public void createAccountBtnClicked(View view){
+        this.username = ((EditText)findViewById(R.id.editText2)).getText().toString().toUpperCase();
+        this.password = ((EditText)findViewById(R.id.editText)).getText().toString();
+        if((this.username.length() > 1) &&(this.password.length() > 2)) {
             message = new max.hej.Message.Builder()
-                    .username(name)
-                    .password(password)
-                    .intent(max.hej.Message.NEW_ACCOUNT)
+                    .username(this.username)
+                    .password(this.password)
+                    .regid(this.regid)
+                    .intent(max.hej.Message.VALIDATE_USER_NAME)
                     .build();
             Communicator comm = new Communicator(message, handler);
             comm.execute();
         }
         else{
-            Context context = getApplicationContext();
-            CharSequence text = "Name must be at least 2 character, and password must be at least 3 characters.";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+            showToast("Name must be at least 2 character, and password must be at least 3 characters.");
         }
+    }
+
+
+
+    public void tryToCreateAccount(){
+            message = new max.hej.Message.Builder()
+                    .username(username)
+                    .password(password)
+                    .regid(regid)
+                    .intent(max.hej.Message.NEW_ACCOUNT)
+                    .build();
+            Communicator comm = new Communicator(message, handler2);
+            comm.execute();
     }
 
     @Override
@@ -157,6 +174,13 @@ public class CreateAccount extends Activity {
             // should never happen
             throw new RuntimeException("Could not get package name: " + e);
         }
+    }
+
+    public void showToast(String message){
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, message, duration);
+        toast.show();
     }
 
 }
