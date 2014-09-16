@@ -30,6 +30,7 @@ public class Communicator extends AsyncTask<Void, Void, String> {
     private max.hej.Message message;
     public static final String SUCCESS = "SUCCESS";
     public static final String FAIL = "FAIL";
+    public static final String NETWORK_ERROR = "NETWORK_ERROR";
 
     public Communicator(max.hej.Message msg, Handler handler){
         this.message = msg;
@@ -73,7 +74,7 @@ public class Communicator extends AsyncTask<Void, Void, String> {
     }
 
 
-    private void connectToServer(){
+    private String connectToServer(){
         try{
             System.out.println("Trying to connect to Hej server");
             InetAddress serverAddr = InetAddress.getByName(URL);
@@ -87,11 +88,15 @@ public class Communicator extends AsyncTask<Void, Void, String> {
             this.OUT = socket.getOutputStream();
             PW = new PrintWriter(socket.getOutputStream(),true);
         }
-        catch(Exception e){e.printStackTrace();}
+        catch(Exception e){e.printStackTrace(); return this.NETWORK_ERROR;}
+
+        return this.SUCCESS;
     }
 
     public String createAccount(){
-        this.connectToServer();
+        if(this.connectToServer().equals(NETWORK_ERROR)){
+            return NETWORK_ERROR;
+        }
         try {
             PW.write(message.asJSONString() + "\n");
             PW.flush();
@@ -120,8 +125,9 @@ public class Communicator extends AsyncTask<Void, Void, String> {
         catch(Exception e){e.printStackTrace();}
     }
     public String validateUsername(){
-        connectToServer();
-
+        if(this.connectToServer().equals(NETWORK_ERROR)){
+            return NETWORK_ERROR;
+        }
         try{
             PW.write(message.asJSONString() + "\n");
             PW.flush();
@@ -139,8 +145,9 @@ public class Communicator extends AsyncTask<Void, Void, String> {
     }
 
     public String checkForUsername(){
-        connectToServer();
-        try{
+        if(this.connectToServer().equals(NETWORK_ERROR)){
+            return NETWORK_ERROR;
+        }        try{
             PW.write(message.asJSONString() + "\n");
             PW.flush();
             return BR.readLine(); //expecting string "valid" or "invalid"

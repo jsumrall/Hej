@@ -118,7 +118,7 @@ public class MyActivity extends Activity {
         else{
             //System.out.println("Unexpected response : " + string);
             Context context = getApplicationContext();
-            CharSequence text = "Network Unavailable" ;
+            CharSequence text = "Problem Connecting to Hej Servers" ;
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
