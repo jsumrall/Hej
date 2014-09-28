@@ -30,12 +30,14 @@
         android:contentDescription="settingBtn"
         android:clickable="true"
         android:onClick="onSettingBtnClick"
-        android:src="@drawable/settingsdot"
-        android:layout_alignParentTop="true"
+        android:src="@drawable/dots"
+        android:adjustViewBounds="true"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="462dp"
-        android:minWidth="30dp"
-        android:minHeight="30dp"/>
+        android:minWidth="20dip"
+        android:minHeight="20dip"
+        android:maxWidth="50dip"
+        android:maxHeight="50dip"
+        android:scaleType="fitXY"/>
 
 </RelativeLayout>

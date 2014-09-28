@@ -44,6 +44,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,4 +61,17 @@
         android:clickable="true"
         android:onClick="inviteFriendsBtnClicked" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:text="Version 1.34"
+        android:id="@+id/textView4"
+        android:gravity="bottom"
+        android:textColor="#ff007bff"
+        android:textSize="8dp" />
+
 </RelativeLayout>
+
+
