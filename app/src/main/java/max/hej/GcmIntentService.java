@@ -17,6 +17,8 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 public class GcmIntentService extends IntentService {
     public int NOTIFICATION_ID = 1;
     NotificationCompat.Builder builder;
@@ -69,18 +71,20 @@ public class GcmIntentService extends IntentService {
     // This is just one simple example of what you might choose to do with
     // a GCM message.
     private void sendNotification(String msg) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+        Uri hejsound = Uri.parse("android.resource://" + getApplicationContext().getPackageName() + "/" + R.raw.hejsound);
+        long[] notifyVibrate = {0, 200, 100, 200};
+        Intent hejIntent = new Intent(this, MyActivity.class);
+        hejIntent.putExtra("sender", msg);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                hejIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-            NOTIFICATION_ID = msg.hashCode();
+        NOTIFICATION_ID = msg.hashCode();
+
+        if (SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+
             NotificationManager mNotificationManager = (NotificationManager)
                     this.getSystemService(Context.NOTIFICATION_SERVICE);
-            Intent hejIntent = new Intent(this, MyActivity.class);
-            hejIntent.putExtra("sender", msg);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                    hejIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-
-            long[] notifyVibrate = {0, 200, 100, 200};
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setAutoCancel(true)
@@ -88,9 +92,8 @@ public class GcmIntentService extends IntentService {
                             .setContentTitle("Hej")
                             .setTicker("Hej from " + msg + "!")
                             .setVibrate(notifyVibrate)
-                            .setSound(Uri.parse("android.resource://" + getApplicationContext().getPackageName() + "/" + R.raw.hejsound))
+                            .setSound(hejsound)
                             .setLights(0xFFFF8B00, 200, 200)
-                            .setDefaults(NotificationCompat.DEFAULT_ALL)
                             .setContentText("Hej from " + msg + "!");
 
 
@@ -100,29 +103,24 @@ public class GcmIntentService extends IntentService {
 
         } else { //Sander Edition
             NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-
+            System.out.println("what the fuck");
             int icon = R.drawable.ic_launcher;
             CharSequence text = "Hej from " + msg + "!";
             CharSequence contentTitle = "Hej";
             CharSequence contentText = "Hej from " + msg + "!";
             long when = System.currentTimeMillis();
 
-            Intent intent = new Intent(this, MyActivity.class);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
             Notification notification = new Notification(icon,text,when);
 
-            long[] vibrate = {0,100,200,300};
-            notification.vibrate = vibrate;
-            notification.sound = Uri.parse("android.resource://" + getApplicationContext().getPackageName() + "/" + R.raw.hejsound);
+            notification.vibrate = notifyVibrate;
+            notification.sound = hejsound;
             notification.ledARGB = 0xFFFF8B00;
             notification.ledOffMS = 200;
             notification.ledOnMS = 200;
 
-            notification.defaults |= Notification.DEFAULT_LIGHTS;
-
             notification.setLatestEventInfo(this, contentTitle, contentText, contentIntent);
 
-            notificationManager.notify(msg.hashCode(), notification);
+            notificationManager.notify(NOTIFICATION_ID, notification);
 
 
         }

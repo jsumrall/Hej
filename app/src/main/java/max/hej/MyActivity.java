@@ -51,7 +51,7 @@ public class MyActivity extends Activity {
         SharedPreferences credentials = getSharedPreferences(PREFS_NAME, 0);
         this.username = credentials.getString("username","not set");
         this.password = credentials.getString("password", "not set");//I'm going to hell for this
-        friends = new FriendList(credentials.getString("friends",username), credentials);
+        friends = new FriendList(credentials.getString("friends",username+",Max"), credentials);
         //System.out.println(username);
         //create two different intents based on creating account or not
         this.createAccountIntent = new Intent(this, CreateAccount.class);

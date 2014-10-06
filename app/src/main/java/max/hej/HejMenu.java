@@ -22,6 +22,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 public class HejMenu extends ListActivity
@@ -29,6 +30,7 @@ public class HejMenu extends ListActivity
     SharedPreferences credentials;
     String username;
     String password;
+    Long lockout;
     Thread t;
     Handler handler;
     Handler handler2;
@@ -37,18 +39,21 @@ public class HejMenu extends ListActivity
     Cursor mCursor;
     ListView listview;
     String[] FRIEND;
+    Toast mToast;
+    LinkedList<Long> prevHejs;
     private max.hej.Message message;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hej_menu);
-
+        prevHejs = new LinkedList<Long>();
         listview = getListView();
         settings = new Intent(this, SettingsMenu.class);
         credentials = getSharedPreferences(MyActivity.PREFS_NAME, 0);
         username = credentials.getString("username", "not set");
         password = credentials.getString("password", "not set");
+        lockout = Long.valueOf(credentials.getString("lockout", "0"));
         checkForNewFriendFromNotification();
         FRIEND = MyActivity.friends.asArray();
 
@@ -119,15 +124,32 @@ public class HejMenu extends ListActivity
     }
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-        message = new max.hej.Message.Builder()
-                .username(username)
-                .password(password)
-                .intent(max.hej.Message.SEND_HEJ)
-                .target(FRIEND[position])
-                .build();
-        Communicator comm = new Communicator(message,handler);
-        comm.execute();
-        Toast.makeText(getApplicationContext(),"Sent Hej to: "+FRIEND[position],Toast.LENGTH_SHORT).show();
+        if(underMessageLimit()) {
+            //Good, sending a message
+            messageCounter();//keeps track of sending messages and activates a "lock" if too many are sent.
+            //such lock is caught in the underMessageLimit() class.
+            message = new max.hej.Message.Builder()
+                    .username(username)
+                    .password(password)
+                    .intent(max.hej.Message.SEND_HEJ)
+                    .target(FRIEND[position])
+                    .build();
+            Communicator comm = new Communicator(message, handler);
+            comm.execute();
+            if (mToast == null) {
+                mToast = Toast.makeText(getApplicationContext(), "Sent Hej to: " + FRIEND[position], Toast.LENGTH_SHORT);
+                mToast.show();
+
+            } else {
+                mToast.setText("Sent Hej to: " + FRIEND[position]);
+                mToast.show();
+            }
+        }
+        else{
+            //Has sent too many messages in time period.
+            mToast.setText("Stop. Breath. No more Hej for you for a little bit.");
+            mToast.show();
+        }
     }
 
 
@@ -206,25 +228,33 @@ public class HejMenu extends ListActivity
         }
     }
 
-    /*public void checkForHejsResults(String string){
-        String[] result = string.split(",");
-        Context context = getApplicationContext();
-        CharSequence text = result[0].equals("") ? "No Hej 4 u" : "Hej from " + result[0] + "!!" ;
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-    }
+    private void messageCounter(){
+        prevHejs.push(System.currentTimeMillis());
+        if(prevHejs.size() > 7){
+            prevHejs.removeLast();
+        }
+        if((prevHejs.size() >= 7) &&((prevHejs.peek() - prevHejs.getLast()) < 10000)){
+            //lockout
+            lockout = System.currentTimeMillis() + 60000;
+            this.credentials.edit().putString("lockout", lockout.toString()).commit();
 
-    public void checkForHejs(View view){
-        Communicator comm = new Communicator(Communicator.requestType.CHECKFORHEJS,username,password,"", handler);
-        comm.execute();
         }
 
 
-
-    public void sendHej(View view){
-        Communicator comm = new Communicator(Communicator.requestType.SEND,username,password,"bob",handler2);
-        comm.execute();
     }
-*/
+
+    private boolean underMessageLimit(){
+        if(lockout == 0){
+            return true;
+        }
+        Long now = System.currentTimeMillis();
+        if(now.compareTo(lockout) > 0){ //Now is after until, meaning we are after the lockout time period
+            lockout = 0L;
+            this.credentials.edit().putString("lockout", "0").commit();
+            return true;
+        }
+        return false;
+
+    }
+
 }
