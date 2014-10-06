@@ -145,10 +145,17 @@ public class HejMenu extends ListActivity
                 mToast.show();
             }
         }
-        else{
-            //Has sent too many messages in time period.
-            mToast.setText("Stop. Breath. No more Hej for you for a little bit.");
+        else {
+            String stopText = "Stop. Breath. No more Hej for you for a little bit.";
+            if (mToast == null) {
+                mToast = Toast.makeText(getApplicationContext(), stopText, Toast.LENGTH_SHORT);
+
+            } else {
+                //Has sent too many messages in time period.
+                mToast.setText(stopText);
+            }
             mToast.show();
+
         }
     }
 
@@ -233,10 +240,10 @@ public class HejMenu extends ListActivity
         if(prevHejs.size() > 7){
             prevHejs.removeLast();
         }
-        if((prevHejs.size() >= 7) &&((prevHejs.peek() - prevHejs.getLast()) < 10000)){
+        if((prevHejs.size() >= 7) &&((prevHejs.peek() - prevHejs.getLast()) < 10000L)){
             //lockout
-            lockout = System.currentTimeMillis() + 60000;
-            this.credentials.edit().putString("lockout", lockout.toString()).commit();
+            lockout = System.currentTimeMillis() + 60000L;
+            this.credentials.edit().putString("lockout", String.valueOf(lockout)).commit();
 
         }
 
@@ -244,7 +251,7 @@ public class HejMenu extends ListActivity
     }
 
     private boolean underMessageLimit(){
-        if(lockout == 0){
+        if(lockout == 0L){
             return true;
         }
         Long now = System.currentTimeMillis();
