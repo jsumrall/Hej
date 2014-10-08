@@ -19,6 +19,7 @@ public class RespondToHej extends Activity {
     String password;
     SharedPreferences credentials;
     Handler handler;
+    FriendList friends;
 
 
     @Override
@@ -29,6 +30,7 @@ public class RespondToHej extends Activity {
         loginScreen = new Intent(this, MyActivity.class);
         username = credentials.getString("username", "not set");
         password = credentials.getString("password", "not set");
+        friends = new FriendList(credentials.getString("friends",username+",Max"), credentials);
 
         handler = new Handler(){
             public void handleMessage(android.os.Message msg){
@@ -40,14 +42,20 @@ public class RespondToHej extends Activity {
         //get notificationmanager context
         NotificationManager mNM = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
 
-        System.out.println(getIntent().getExtras());
         Bundle extras = getIntent().getExtras();
-            if(extras.containsKey("respondTo")){
+        if(extras != null) {
+            if (extras.containsKey("sender")) {
+                String msgFrom = extras.getString("sender");
+                if (!msgFrom.equals("null")) {
+                    friends.addIfNotFriend(msgFrom);//add the person to friends list if they are not a friend.
+                }
+            }
+            if (extras.containsKey("respondTo")) {
                 String msgFrom = extras.getString("respondTo");
-                if(!msgFrom.equals("null")) {
-                            //Cancel the notification
-                            mNM.cancel(msgFrom.hashCode());//i made the id the hash
-                            message = new max.hej.Message.Builder()
+                if (!msgFrom.equals("null")) {
+                    //Cancel the notification
+                    mNM.cancel(msgFrom.hashCode());//i made the id the hash
+                    message = new max.hej.Message.Builder()
                             .username(username)
                             .password(password)
                             .intent(max.hej.Message.SEND_HEJ)
@@ -67,7 +75,7 @@ public class RespondToHej extends Activity {
 
             }
             startActivity(loginScreen);
-
+        }
 
     }
     public void onResume(Bundle savedInstance){

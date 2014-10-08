@@ -111,7 +111,6 @@ public class HejMenu extends ListActivity
                 }
             });
         }
-        AppRater.app_launched(this);
 
     }
     public void onResume(){
@@ -231,7 +230,6 @@ public class HejMenu extends ListActivity
                     MyActivity.friends.addIfNotFriend(msgFrom);//add the person to friends list if they are not a friend.
                 }
             }
-            System.out.println(extras);
             if(extras.containsKey("respondTo")){
                 String msgFrom = extras.getString("respondTo");
                 if(!msgFrom.equals("null")) {

@@ -75,7 +75,6 @@ public class GcmIntentService extends IntentService {
         long[] notifyVibrate = {0, 200, 100, 200};
         Intent hejIntent = new Intent(this, MyActivity.class);
         hejIntent.putExtra("sender", msg);
-        hejIntent.putExtra("respondTo", msg);
         Intent respondIntent = new Intent(this, RespondToHej.class); //An intent to be used by the ReplyTo button
         respondIntent.putExtra("sender", msg);
         respondIntent.putExtra("respondTo", msg);
