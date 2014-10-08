@@ -54,7 +54,7 @@ public class HejMenu extends ListActivity
         username = credentials.getString("username", "not set");
         password = credentials.getString("password", "not set");
         lockout = Long.valueOf(credentials.getString("lockout", "0"));
-        checkForNewFriendFromNotification();
+        checkForDataFromNotification();
         FRIEND = MyActivity.friends.asArray();
 
         handler = new Handler(){
@@ -116,7 +116,7 @@ public class HejMenu extends ListActivity
     }
     public void onResume(){
         super.onResume();
-        checkForNewFriendFromNotification();
+        checkForDataFromNotification();
         FRIEND = MyActivity.friends.asArray();
         listview.setAdapter(new CustomAdapter(getApplicationContext(), FRIEND));
         listview.setOnItemClickListener(this);
@@ -146,7 +146,7 @@ public class HejMenu extends ListActivity
             }
         }
         else {
-            String stopText = "Stop. Breath. No more Hej for you for a little bit.";
+            String stopText = "Time to relax. You can Hej again in " + timeoutTimeRemaining() + " seconds!";
             if (mToast == null) {
                 mToast = Toast.makeText(getApplicationContext(), stopText, Toast.LENGTH_SHORT);
 
@@ -222,7 +222,7 @@ public class HejMenu extends ListActivity
             return convertView;
         }
     }
-    private void checkForNewFriendFromNotification(){
+    private void checkForDataFromNotification(){
         Bundle extras = getIntent().getExtras();
         if(extras != null){
             if(extras.containsKey("sender")){
@@ -230,6 +230,29 @@ public class HejMenu extends ListActivity
                 if(!msgFrom.equals("null")) {
                     MyActivity.friends.addIfNotFriend(msgFrom);//add the person to friends list if they are not a friend.
                 }
+            }
+            System.out.println(extras);
+            if(extras.containsKey("respondTo")){
+                String msgFrom = extras.getString("respondTo");
+                if(!msgFrom.equals("null")) {
+                    message = new max.hej.Message.Builder()
+                            .username(username)
+                            .password(password)
+                            .intent(max.hej.Message.SEND_HEJ)
+                            .target(msgFrom)
+                            .build();
+                    Communicator comm = new Communicator(message, handler);
+                    comm.execute();
+                    if (mToast == null) {
+                        mToast = Toast.makeText(getApplicationContext(), "Sent Hej to: " + msgFrom, Toast.LENGTH_SHORT);
+                        mToast.show();
+
+                    } else {
+                        mToast.setText("Sent Hej to: " + msgFrom);
+                        mToast.show();
+                    }
+                }
+
             }
 
         }
@@ -261,6 +284,11 @@ public class HejMenu extends ListActivity
             return true;
         }
         return false;
+
+    }
+    private long timeoutTimeRemaining(){
+        Long now = System.currentTimeMillis();
+        return (lockout - now)/1000;
 
     }
 

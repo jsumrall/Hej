@@ -9,5 +9,6 @@
     <string name="settingBtn">Settings</string>
     <string name="title_activity_settings_menu">SettingsMenu</string>
     <string name="title_activity_my_activity2">MyActivity2</string>
+    <string name="title_activity_respond_to_hej">RespondToHej</string>
 
 </resources>

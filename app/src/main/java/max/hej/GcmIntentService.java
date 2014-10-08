@@ -75,8 +75,12 @@ public class GcmIntentService extends IntentService {
         long[] notifyVibrate = {0, 200, 100, 200};
         Intent hejIntent = new Intent(this, MyActivity.class);
         hejIntent.putExtra("sender", msg);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                hejIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        hejIntent.putExtra("respondTo", msg);
+        Intent respondIntent = new Intent(this, RespondToHej.class); //An intent to be used by the ReplyTo button
+        respondIntent.putExtra("sender", msg);
+        respondIntent.putExtra("respondTo", msg);
+        PendingIntent respondToIntent = PendingIntent.getActivity(this, msg.hashCode(), respondIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, msg.hashCode(), hejIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NOTIFICATION_ID = msg.hashCode();
 
@@ -87,12 +91,14 @@ public class GcmIntentService extends IntentService {
 
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
+                            .addAction(R.drawable.arrow, "Send Hej Back", respondToIntent)
                             .setAutoCancel(true)
                             .setSmallIcon(R.drawable.ic_launcher)
                             .setContentTitle("Hej")
                             .setTicker("Hej from " + msg + "!")
                             .setVibrate(notifyVibrate)
                             .setSound(hejsound)
+                            .setPriority(Notification.PRIORITY_MAX)
                             .setLights(0xFFFF8B00, 200, 200)
                             .setContentText("Hej from " + msg + "!");
 
