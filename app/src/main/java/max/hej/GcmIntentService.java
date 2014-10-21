@@ -75,10 +75,10 @@ public class GcmIntentService extends IntentService {
         long[] notifyVibrate = {0, 200, 100, 200};
         Intent hejIntent = new Intent(this, MyActivity.class);
         hejIntent.putExtra("sender", msg);
-        Intent respondIntent = new Intent(this, RespondToHej.class); //An intent to be used by the ReplyTo button
+        Intent respondIntent = new Intent(this, respondHejService.class); //An intent to be used by the ReplyTo button
         respondIntent.putExtra("sender", msg);
         respondIntent.putExtra("respondTo", msg);
-        PendingIntent respondToIntent = PendingIntent.getActivity(this, msg.hashCode(), respondIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent respondToIntent = PendingIntent.getService(this, msg.hashCode(), respondIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         PendingIntent contentIntent = PendingIntent.getActivity(this, msg.hashCode(), hejIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NOTIFICATION_ID = msg.hashCode();
