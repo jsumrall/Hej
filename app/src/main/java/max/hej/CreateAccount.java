@@ -17,6 +17,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 //import max.hej.MyActivity.R;
 
+/**
+ * This whole class is awful becasue of how usernames and passwords are handled. 
+ */
+ 
 public class CreateAccount extends Activity {
     Handler handler;
     Handler handler2;
@@ -57,8 +61,8 @@ public class CreateAccount extends Activity {
         System.out.println(result);
             if (result.equals(Communicator.SUCCESS)) {
                     SharedPreferences credentials = getSharedPreferences(MyActivity.PREFS_NAME, 0);
-                    credentials.edit().putString("username", username).commit();
-                    credentials.edit().putString("password", password).commit();
+                    credentials.edit().putString("username", username).commit(); // This is BAD
+                    credentials.edit().putString("password", password).commit(); // This is WORSE
                     showToast("Account Recovered");
                     Intent intent = new Intent(this, MyActivity.class);
                     startActivity(intent);
